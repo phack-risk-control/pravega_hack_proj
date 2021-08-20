@@ -1,0 +1,47 @@
+buildscript {
+    repositories {
+        maven { url "https://maven.aliyun.com/repository/jcenter" }
+        maven { url "https://maven.aliyun.com/repository/gradle-plugin" }
+    }
+
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:5.2.0"
+    }
+}
+plugins {
+    id 'java'
+}
+apply plugin: "com.github.johnrengelman.shadow"
+group 'io.phack'
+version '1.0-SNAPSHOT'
+
+repositories {
+    maven { url 'http://maven.aliyun.com/nexus/content/repositories/central/' }
+}
+
+dependencies {
+    //compile "de.javakaffee:kryo-serializers:${kryoSerializerVersion}"
+
+    compile "io.pravega:pravega-keycloak-client:${pravegaKeycloakVersion}"
+
+    //compile "org.scala-lang.modules:scala-java8-compat_${flinkScalaVersion}:${scalaJava8CompatVersion}"
+    compile "io.pravega:pravega-connectors-flink-${flinkMajorMinorVersion}_${flinkScalaVersion}:${flinkConnectorVersion}"
+    compile "org.apache.flink:flink-streaming-java_${flinkScalaVersion}:${flinkVersion}"
+    compile "org.apache.flink:flink-clients_${flinkScalaVersion}:${flinkVersion}"
+
+    compile "org.slf4j:slf4j-log4j12:${slf4jLog4JVersion}"
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+shadowJar {
+    dependencies {
+       // include dependency("org.scala-lang.modules:scala-java8-compat_${flinkScalaVersion}")
+        include dependency("io.pravega:pravega-connectors-flink-${flinkMajorMinorVersion}_${flinkScalaVersion}")
+        include dependency("io.pravega:pravega-keycloak-client:${pravegaKeycloakVersion}")
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
